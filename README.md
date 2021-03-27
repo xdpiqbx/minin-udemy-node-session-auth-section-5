@@ -47,5 +47,53 @@
 ## 51. Страница логина
 
 ```hbs
-<!-- /views/auth.hbs -->
+<!-- /views/auth/login.hbs -->
+<!-- https://materializecss.com/tabs.html -->
+<div class="row">
+  <div class="col s12">
+    <ul class="tabs">
+      <li class="tab col s6"><a class="active" href="#login">login</a></li>
+      <li class="tab col s6"><a href="#register">register</a></li>
+    </ul>
+  </div>
+  <div id="login" class="col s6 offset-s3">Test 1</div>
+  <div id="register" class="col s6 offset-s3">Test 2</div>
+</div>
+```
+
+```js
+// /routes/auth.js
+const { Router } = require('express');
+const router = Router();
+
+router.get('/login', async (req, res) => {
+  res.render('auth/login.hbs', {
+    title: 'Authorization',
+    isLogin: true,
+  });
+});
+
+module.exports = router;
+```
+
+```js
+// /index.js
+const authRoutes = require('./routes/auth');
+//...
+app.use('/auth', authRoutes);
+//...
+```
+
+```hbs
+<!-- /views/partials/navbar.hbs -->
+  {{#if isLogin}}
+    <li class="active"><a href="/login#login">Login</a></li>
+  {{else}}
+    <li><a href="/auth/login#login">Login</a></li>
+  {{/if}}
+```
+
+```js
+// public/app.js //инициализация табов
+M.Tabs.init(document.querySelectorAll('.tabs'));
 ```

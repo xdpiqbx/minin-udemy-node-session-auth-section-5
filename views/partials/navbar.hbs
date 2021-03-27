@@ -33,6 +33,12 @@
       <li><a href="/order">Order</a></li>
       {{/if}}
 
+      {{#if isLogin}}
+      <li class="active"><a href="/login#login">Login</a></li>
+      {{else}}
+      <li><a href="/auth/login#login">Login</a></li>
+      {{/if}}
+
     </ul>
   </div>
 </nav>

@@ -18,8 +18,6 @@ router.get('/', async (req, res) => {
       };
     });
 
-    console.log(orders[0].courses);
-
     await res.status(200);
     res.render('order.hbs', {
       title: 'Orders',

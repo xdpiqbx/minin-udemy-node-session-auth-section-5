@@ -6,12 +6,15 @@ const exphbs = require('express-handlebars');
 const {
   allowInsecurePrototypeAccess,
 } = require('@handlebars/allow-prototype-access');
+const session = require('express-session');
 const homeRoutes = require('./routes/home');
 const coursesRoutes = require('./routes/courses');
 const addRoutes = require('./routes/add');
 const cartRoutes = require('./routes/cart');
 const orderRoutes = require('./routes/order');
 const authRoutes = require('./routes/auth');
+
+const varsMiddleware = require('./middleware/variables');
 
 const User = require('./models/schemas/schUser');
 
@@ -39,6 +42,14 @@ app.use(async (req, res, next) => {
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
+app.use(
+  session({
+    secret: 'secretString',
+    resave: false,
+    saveUninitialized: false,
+  }),
+);
+app.use(varsMiddleware);
 app.use('/', homeRoutes);
 app.use('/courses', coursesRoutes);
 app.use('/add', addRoutes);

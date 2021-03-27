@@ -42,6 +42,84 @@
 
 ## 52. Добавление сессии
 
+[express-session](https://www.npmjs.com/package/express-session) - Create a
+session middleware
+
+```code
+npm i express-session
+```
+
+```js
+// index.js
+const session = require('express-session');
+const varsMiddleware = require('./middleware/variables');
+
+app.use(
+  session({
+    secret: 'secretString',
+    resave: false,
+    saveUninitialized: false,
+  }),
+);
+app.use(varsMiddleware); // из /middleware/variables.js
+```
+
+```js
+// routes/auth.js  ===---> Login POST and Logout GET
+// ...
+router.get('/logout', async (req, res) => {
+  req.session.destroy(() => {
+    res.redirect('/auth/login#login');
+  });
+});
+
+router.post('/login', async (req, res) => {
+  req.session.isAuthenticated = true;
+  res.redirect('/');
+});
+router.post('/register', async (req, res) => {});
+// ...
+```
+
+```js
+// /middleware/variables.js
+module.exports = function (req, res, next) {
+  res.locals.isAuth = req.session.isAuthenticated;
+  next();
+};
+```
+
+```hbs
+<!-- /views/partials/navbar.hbs -->
+<!-- Сейчас для каждого ответа есть переменная isAuth тепероь можно скрыть пути -->
+{{#if isAuth}}
+  {{#if isAdd}}
+    <li class="active"><a href="/add">Add course</a></li>
+  {{else}}
+    <li><a href="/add">Add course</a></li>
+  {{/if}}
+
+  {{#if isCart}}
+    <li class="active"><a href="/cart">Cart</a></li>
+  {{else}}
+    <li><a href="/cart">Cart</a></li>
+  {{/if}}
+
+  {{#if isOrder}}
+    <li class="active"><a href="/order">Order</a></li>
+  {{else}}
+    <li><a href="/order">Order</a></li>
+  {{/if}}
+  <li><a href="/auth/logout">Logout</a></li> <!-- добавил возможность логаута -->
+{{else}}
+  {{#if isLogin}}
+    <li class="active"><a href="/login#login">Login</a></li>
+  {{else}}
+    <li><a href="/auth/login#login">Login</a></li>
+  {{/if}}
+{{/if}}
+```
+
 ---
 
 ## 51. Страница логина
@@ -62,7 +140,7 @@
 ```
 
 ```js
-// /routes/auth.js
+// /routes/auth.js ===---> GET
 const { Router } = require('express');
 const router = Router();
 

@@ -14,6 +14,36 @@
 
 ## 59. Шифрование пароля
 
+[bcryptjs](https://www.npmjs.com/package/bcryptjs) - Optimized bcrypt in
+JavaScript with zero dependencies. Compatible to the C++ bcrypt binding on
+node.js and also working in the browser.
+
+```code
+npm i bcryptjs
+```
+
+```js
+// /routes/auth.js
+const bcrypt = require('bcryptjs');
+
+router.post('/login', async (req, res) => {
+  //  ...
+  // const areSame = password === candidate.password;
+  const areSame = await bcrypt.compare(password, candidate.password);
+});
+
+router.post('/register', async (req, res) => {
+  //  ...
+  const hashPassword = await bcrypt.hash(password, 10);
+  const user = new User({
+    email,
+    name,
+    password: hashPassword,
+    cart: { items: [] },
+  });
+});
+```
+
 ---
 
 ## 58. Логин пользователя

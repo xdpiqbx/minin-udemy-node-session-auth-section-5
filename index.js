@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
+const csrf = require('csurf');
 const Handlebars = require('handlebars');
 const exphbs = require('express-handlebars');
 const {
@@ -52,6 +53,7 @@ app.use(
     store,
   }),
 );
+app.use(csrf());
 app.use(varsMiddleware);
 app.use(userMiddleware);
 app.use('/', homeRoutes);

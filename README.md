@@ -10,6 +10,54 @@
 
 ## 60. Добавление CSRF-защиты
 
+[csurf](https://www.npmjs.com/package/csurf) - Node.js CSRF protection
+middleware.
+
+```code
+npm i csurf
+```
+
+```js
+// index.js
+const csurf = require('csurf');
+app.use(csurf()); // теперь на все пост запросы требуется токен
+// надо создать middleware
+```
+
+```js
+// middleware/variables.js // дополняю
+module.exports = function (req, res, next) {
+  res.locals.isAuth = req.session.isAuthenticated;
+  res.locals.csrf = req.csrfToken(); /// <<< ---- =======
+  next();
+};
+```
+
+```hbs
+<!-- Ко всем формам кторые обрабатывают POST нужно добавить такой input -->
+<input type="hidden" name="_csrf" value={{csrf}} />
+
+<!-- Если это внутри #each не забывать про @root -->
+<input type="hidden" name="_csrf" value={{@root.csrf}} />
+```
+
+```js
+// /public/app.js
+// в вёрстку везде кнопкам удалить добавил data-csrf=${csrf}
+
+const csrf = event.target.dataset.csrf;
+
+fetch(`/cart/remove/${id}`, {
+  method: 'delete',
+  headers: {
+    'X-XSRF-TOKEN': csrf,
+  },
+  // body: JSON.stringify({
+  //   _csrf: csrf,
+  // }),
+}).then(res => res.json());
+```
+
 ---
 
 ## 59. Шифрование пароля

@@ -22,6 +22,36 @@
 
 ## 57. Регистрация пользователя
 
+```js
+// /routes/auth.js
+router.post('/register', async (req, res) => {
+  try {
+    const { email, password, repeat, name } = req.body;
+    const candidate = await User.findOne({ email });
+    if (candidate) {
+      res.redirect('/auth/login#register');
+    } else {
+      const user = new User({ email, name, password, cart: { items: [] } });
+      const newUser = await user.save();
+      res.redirect('/auth/login#login');
+    }
+  } catch (error) {
+    console.log(error);
+  }
+});
+```
+
+```js
+// /models/schemas/schUser.js
+const userSchema = new Schema({
+  password: {
+    // просто добавил это поле
+    type: String,
+    required: true,
+  },
+});
+```
+
 ---
 
 ## 56. Исправление работы корзины

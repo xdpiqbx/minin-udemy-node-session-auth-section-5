@@ -18,6 +18,35 @@
 
 ## 58. Логин пользователя
 
+```js
+// /routes/auth.js // переписал логику логина
+router.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const candidate = await User.findOne({ email });
+    if (!candidate) {
+      res.redirect('/auth/login#login');
+    } else {
+      const areSame = password === candidate.password;
+      if (!areSame) {
+        res.redirect('/auth/login#login');
+      } else {
+        req.session.user = candidate;
+        req.session.isAuthenticated = true;
+        req.session.save(err => {
+          if (err) {
+            throw err;
+          }
+          res.redirect('/');
+        });
+      }
+    }
+  } catch (error) {
+    console.log(error);
+  }
+});
+```
+
 ---
 
 ## 57. Регистрация пользователя

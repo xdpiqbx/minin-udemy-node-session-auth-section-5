@@ -26,6 +26,35 @@
 
 ## 56. Исправление работы корзины
 
+```js
+// Создаю middleware
+// /middleware/midUser.js
+const User = require('../models/schemas/schUser');
+
+module.exports = async function (req, res, next) {
+  if (!req.session.user) {
+    return next();
+  }
+  req.user = await User.findById(req.session.user._id);
+  next();
+};
+```
+
+```js
+// Подключаю middleware в index.js
+const userMiddleware = require('./middleware/midUser');
+app.use(userMiddleware);
+```
+
+```js
+router.post('/add', authMiddleware, async (req, res) => {
+  const course = await Course.findById(req.body.id);
+  // до использования middleware пользователь хранился в сессии, а в сессии просто лежат его данные а не объект Mongoose и метода .addToCart у него нету
+  await req.user.addToCart(course);
+  res.redirect('/cart');
+});
+```
+
 ---
 
 ## 55. Защита роутов

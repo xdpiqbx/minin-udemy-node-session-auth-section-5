@@ -16,6 +16,7 @@ const orderRoutes = require('./routes/order');
 const authRoutes = require('./routes/auth');
 
 const varsMiddleware = require('./middleware/variables');
+const userMiddleware = require('./middleware/midUser');
 
 const User = require('./models/schemas/schUser');
 
@@ -52,6 +53,7 @@ app.use(
   }),
 );
 app.use(varsMiddleware);
+app.use(userMiddleware);
 app.use('/', homeRoutes);
 app.use('/courses', coursesRoutes);
 app.use('/add', addRoutes);
@@ -68,15 +70,7 @@ async function start() {
       useUnifiedTopology: true,
       useFindAndModify: false,
     });
-    // const candidate = await User.findOne();
-    // if (!candidate) {
-    //   const user = new User({
-    //     email: 'fish@mail.com',
-    //     name: 'John Fishman',
-    //     cart: { items: [] },
-    //   });
-    //   await user.save();
-    // }
+
     app.listen(3000, () => {
       console.log(`Server is runing on port ${PORT}`);
     });

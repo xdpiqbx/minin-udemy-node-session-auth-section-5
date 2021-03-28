@@ -38,6 +38,48 @@
 
 ## 53. Сохранение сессии
 
+В **`index.js`** убрать
+
+```js
+// app.use(async (req, res, next) => {
+//   try {
+//     const user = await User.findById('605c298993a6da28205e86cd');
+//     req.user = user;
+//     next();
+//   } catch (e) {
+//     console.log(e);
+//   }
+// });
+
+// const candidate = await User.findOne();
+// if (!candidate) {
+//   const user = new User({
+//     email: 'fish@mail.com',
+//     name: 'John Fishman',
+//     cart: { items: [] },
+//   });
+//   await user.save();
+// }
+```
+
+```js
+// /routes/auth.js (жду пользователя которого убрал выше)
+const User = require('../models/schemas/schUser');
+
+router.post('/login', async (req, res) => {
+  const user = await User.findById('605c298993a6da28205e86cd');
+  req.session.user = user;
+  req.session.isAuthenticated = true;
+  // req.session может не успеть отрабоать по этому save
+  req.session.save(err => {
+    if (err) {
+      throw err;
+    }
+    res.redirect('/');
+  });
+});
+```
+
 ---
 
 ## 52. Добавление сессии

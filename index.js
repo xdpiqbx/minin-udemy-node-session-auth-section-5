@@ -7,6 +7,7 @@ const {
   allowInsecurePrototypeAccess,
 } = require('@handlebars/allow-prototype-access');
 const session = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(session);
 const homeRoutes = require('./routes/home');
 const coursesRoutes = require('./routes/courses');
 const addRoutes = require('./routes/add');
@@ -26,19 +27,19 @@ const hbs = exphbs.create({
   handlebars: allowInsecurePrototypeAccess(Handlebars),
 });
 
+const pwd = 'Qq5uZAazaPottk2p';
+const clr = 'minin-cluster';
+const db = 'coursesShop';
+const MONGODB_URI = `mongodb+srv://werdex:${pwd}@${clr}.lag7a.mongodb.net/${db}?retryWrites=true&w=majority`;
+
+const store = new MongoDBStore({
+  collection: 'sessions',
+  uri: MONGODB_URI,
+});
+
 app.engine('hbs', hbs.engine); // тут зарегистрировал что есть такой движ
 app.set('view engine', 'hbs'); // тут прямо указываю какой движ использую
 app.set('views', 'views'); // Тут указываю название папки где лежат шаблоны ('views' это по умолчанию)
-
-// app.use(async (req, res, next) => {
-//   try {
-//     const user = await User.findById('605c298993a6da28205e86cd');
-//     req.user = user;
-//     next();
-//   } catch (e) {
-//     console.log(e);
-//   }
-// });
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
@@ -47,6 +48,7 @@ app.use(
     secret: 'secretString',
     resave: false,
     saveUninitialized: false,
+    store,
   }),
 );
 app.use(varsMiddleware);
@@ -60,13 +62,8 @@ app.use('/auth', authRoutes);
 const PORT = process.env.PORT || 3000;
 
 async function start() {
-  const pwd = 'Qq5uZAazaPottk2p';
-  const clr = 'minin-cluster';
-  const db = 'coursesShop';
-  const url = `mongodb+srv://werdex:${pwd}@${clr}.lag7a.mongodb.net/${db}?retryWrites=true&w=majority`;
-
   try {
-    await mongoose.connect(url, {
+    await mongoose.connect(MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useFindAndModify: false,

@@ -1,7 +1,6 @@
 const { Router } = require('express');
-// const Course = require('../models/course')
+const authMiddleware = require('../middleware/midAuth');
 const courseSchema = require('../models/schemas/schCourse');
-const Cart = require('../models/cart');
 const router = Router();
 
 router.get('/', async (req, res) => {
@@ -18,7 +17,7 @@ router.get('/', async (req, res) => {
   });
 });
 
-router.get('/:id/edit', async (req, res) => {
+router.get('/:id/edit', authMiddleware, async (req, res) => {
   if (!req.query.allow) {
     return res.redirect('/');
   }
@@ -29,7 +28,7 @@ router.get('/:id/edit', async (req, res) => {
   });
 });
 
-router.post('/edit', async (req, res) => {
+router.post('/edit', authMiddleware, async (req, res) => {
   // await Course.update(req.body);
   const { id } = req.body;
   delete req.body.id;
@@ -37,7 +36,7 @@ router.post('/edit', async (req, res) => {
   res.redirect('/courses');
 });
 
-router.post('/remove', async (req, res) => {
+router.post('/remove', authMiddleware, async (req, res) => {
   try {
     await courseSchema.findByIdAndDelete(req.body.id);
     res.redirect('/courses');

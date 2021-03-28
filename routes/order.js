@@ -1,9 +1,10 @@
 const { Router } = require('express');
 const Order = require('../models/schemas/schOrder');
+const authMiddleware = require('../middleware/midAuth');
 const router = Router();
 
 //  get запрос это просто клик по ссылке из navbar.hbs
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
   try {
     const userOrders = await Order.find({
       'user.userId': req.user._id,
@@ -29,7 +30,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   try {
     const user = await req.user.populate('cart.items.courseId').execPopulate();
 

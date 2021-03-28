@@ -30,9 +30,75 @@
 
 ## 55. Защита роутов
 
+```js
+// /middleware/midAuth.js
+// Создаю middleware
+module.exports = function (req, res, next) {
+  if (!req.session.isAuthenticated) {
+    return res.redirect('/auth/login');
+  }
+  next();
+};
+```
+
+```js
+// Подключаю middleware везде где надо защитить пути
+const authMiddleware = require('../middleware/midAuth');
+
+router.post('/add', authMiddleware, async (req, res) => { ...
+router.delete('/remove/:id', authMiddleware, async (req, res) => { ...
+router.get('/', authMiddleware, async (req, res) => { ...
+```
+
 ---
 
 ## 54. Сессия в базе данных
+
+[connect-mongodb-session](https://www.npmjs.com/package/connect-mongodb-session) -
+This module exports a single function which takes an instance of connect (or
+Express) and returns a MongoDBStore class that can be used to store sessions in
+MongoDB.
+
+```code
+npm i connect-mongodb-session
+```
+
+```js
+// index.js
+const MongoDBStore = require('connect-mongodb-session')(session);
+
+const MONGODB_URI = `mongodb+srv://user:pass@cluster.lag7a.mongodb.net/db`;
+
+const store = new MongoDBStore({
+  collection: 'sessions',
+  uri: MONGODB_URI,
+});
+
+app.use(
+  session({
+    secret: 'secretString',
+    resave: false,
+    saveUninitialized: false,
+    store, // добавляю место хранения сессии
+  }),
+);
+
+try {
+  await mongoose.connect(MONGODB_URI, { ....
+```
+
+```hbs
+<!-- /view/courses.hbs тут скрываю кнопки от неавторизированых пользователей -->
+{{#each courses}}
+  {{#if @root.isAuth}}
+    <a href="/courses/{{id}}/edit?allow=true">Edit</a>
+    <form action="/cart/add" method="POST">
+      <input type="hidden" name="id" value={{id}} />
+      <button type="submit" class="btn btn-primary">Add to cart</button>
+    </form>
+  {{/if}}
+{{/each}}
+```
 
 ---
 

@@ -1,15 +1,15 @@
 const { Router } = require('express');
 const router = Router();
 const Course = require('../models/schemas/schCourse');
-// const Cart = require('../models/cart');
+const authMiddleware = require('../middleware/midAuth');
 
-router.post('/add', async (req, res) => {
+router.post('/add', authMiddleware, async (req, res) => {
   const course = await Course.findById(req.body.id);
   await req.user.addToCart(course);
   res.redirect('/cart');
 });
 
-router.delete('/remove/:id', async (req, res) => {
+router.delete('/remove/:id', authMiddleware, async (req, res) => {
   await req.user.removeFromCartById(req.params.id);
   const user = await req.user.populate('cart.items.courseId').execPopulate();
   const courses = mapCartItems(user.cart.items);
@@ -17,7 +17,7 @@ router.delete('/remove/:id', async (req, res) => {
   res.status(200).json(cart);
 });
 
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
   const user = await req.user.populate('cart.items.courseId').execPopulate();
   const courses = mapCartItems(user.cart.items);
   res.render('cart.hbs', {
